@@ -30,8 +30,9 @@ export const offersReducer = (state = { offers: [] }, action) => {
         case ALL_OFFERS_REQUEST:
         case ADMIN_OFFERS_REQUEST:
             return {
+                ...state,
                 loading: true,
-                offers: []
+                error: null
             }
 
         case ALL_OFFERS_SUCCESS:
@@ -52,6 +53,7 @@ export const offersReducer = (state = { offers: [] }, action) => {
         case ALL_OFFERS_FAIL:
         case ADMIN_OFFERS_FAIL:
             return {
+                ...state,
                 loading: false,
                 error: action.payload
             }
@@ -73,7 +75,8 @@ export const newOfferReducer = (state = { offer: {} }, action) => {
         case NEW_OFFER_REQUEST:
             return {
                 ...state,
-                loading: true
+                loading: true,
+                error: null
             }
 
         case NEW_OFFER_SUCCESS:
@@ -86,6 +89,7 @@ export const newOfferReducer = (state = { offer: {} }, action) => {
         case NEW_OFFER_FAIL:
             return {
                 ...state,
+                loading: false,
                 error: action.payload
             }
 
@@ -113,7 +117,8 @@ export const offerReducer = (state = {}, action) => {
         case UPDATE_OFFER_REQUEST:
             return {
                 ...state,
-                loading: true
+                loading: true,
+                error: null
             }
 
         case DELETE_OFFER_SUCCESS:
@@ -135,6 +140,7 @@ export const offerReducer = (state = {}, action) => {
         case UPDATE_OFFER_FAIL:
             return {
                 ...state,
+                loading: false,
                 error: action.payload
             }
 
@@ -167,7 +173,8 @@ export const offerDetailsReducer = (state = { offer: {} }, action) => {
         case OFFER_DETAILS_REQUEST:
             return {
                 ...state,
-                loading: true
+                loading: true,
+                error: null
             }
 
         case OFFER_DETAILS_SUCCESS:
@@ -179,6 +186,7 @@ export const offerDetailsReducer = (state = { offer: {} }, action) => {
         case OFFER_DETAILS_FAIL:
             return {
                 ...state,
+                loading: false,
                 error: action.payload
             }
 

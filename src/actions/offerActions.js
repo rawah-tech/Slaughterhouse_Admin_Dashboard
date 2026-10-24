@@ -1,4 +1,5 @@
-import axios from 'axios';
+import apiClient from '../api/client'
+import { getApiErrorMessage } from '../api/errors'
 
 import {
     ALL_OFFERS_REQUEST,
@@ -24,18 +25,21 @@ import {
 
 } from '../constants/offerConstants'
 
-export const getOffers = (keyword = '', currentPage = 1, price, category, rating = 0) => async (dispatch) => {
+export const getOffers = (keyword = '', currentPage = 1, price = [], category, rating = 0) => async (dispatch) => {
     try {
 
         dispatch({ type: ALL_OFFERS_REQUEST })
 
-        let link = `/api/v1/OFFERs?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&ratings[gte]=${rating}`
+        const priceQuery = price.length >= 2
+            ? `&price[lte]=${encodeURIComponent(price[1])}&price[gte]=${encodeURIComponent(price[0])}`
+            : ''
+        let link = `/api/v1/OFFERs?keyword=${encodeURIComponent(keyword)}&page=${currentPage}${priceQuery}&ratings[gte]=${rating}`
 
         if (category) {
-            link = `/api/v1/OFFERs?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&category=${category}&ratings[gte]=${rating}`
+            link += `&category=${encodeURIComponent(category)}`
         }
 
-        const { data } = await axios.get(link)
+        const { data } = await apiClient.get(link)
 
         dispatch({
             type: ALL_OFFERS_SUCCESS,
@@ -45,7 +49,7 @@ export const getOffers = (keyword = '', currentPage = 1, price, category, rating
     } catch (error) {
         dispatch({
             type: ALL_OFFERS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -55,13 +59,7 @@ export const newOffer = (offerData) => async (dispatch) => {
 
         dispatch({ type: NEW_OFFER_REQUEST })
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-			const { data } = await axios.post(`/api/v1/admin/Offer/new`, JSON.stringify(offerData), config)
+        const { data } = await apiClient.post(`/api/v1/admin/Offer/new`, offerData)
 
         dispatch({
             type: NEW_OFFER_SUCCESS,
@@ -71,7 +69,7 @@ export const newOffer = (offerData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: NEW_OFFER_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -82,7 +80,7 @@ export const deleteOffer = (id) => async (dispatch) => {
 
         dispatch({ type: DELETE_OFFER_REQUEST })
 
-        const { data } = await axios.delete(`/api/v1/admin/offer/${id}`)
+        const { data } = await apiClient.delete(`/api/v1/admin/offer/${id}`)
 
         dispatch({
             type: DELETE_OFFER_SUCCESS,
@@ -92,7 +90,7 @@ export const deleteOffer = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: DELETE_OFFER_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -103,13 +101,7 @@ export const updateOffer = (id, offerData) => async (dispatch) => {
 
         dispatch({ type: UPDATE_OFFER_REQUEST })
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.put(`/api/v1/admin/offer/${id}`, JSON.stringify(offerData), config)
+        const { data } = await apiClient.put(`/api/v1/admin/offer/${id}`, offerData)
 
         dispatch({
             type: UPDATE_OFFER_SUCCESS,
@@ -119,7 +111,7 @@ export const updateOffer = (id, offerData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: UPDATE_OFFER_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -129,7 +121,7 @@ export const getOfferDetails = (id) => async (dispatch) => {
 
         dispatch({ type: OFFER_DETAILS_REQUEST })
 
-        const { data } = await axios.get(`/api/v1/offer/${id}`)
+        const { data } = await apiClient.get(`/api/v1/offer/${id}`)
 
         dispatch({
             type: OFFER_DETAILS_SUCCESS,
@@ -139,7 +131,7 @@ export const getOfferDetails = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: OFFER_DETAILS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -149,7 +141,7 @@ export const getAdminOffers = () => async (dispatch) => {
 
         dispatch({ type: ADMIN_OFFERS_REQUEST })
 
-        const { data } = await axios.get(`/api/v1/offers`)
+        const { data } = await apiClient.get(`/api/v1/offers`)
 
         dispatch({
             type: ADMIN_OFFERS_SUCCESS,
@@ -160,7 +152,7 @@ export const getAdminOffers = () => async (dispatch) => {
 
         dispatch({
             type: ADMIN_OFFERS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }

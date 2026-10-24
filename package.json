@@ -1,91 +1,63 @@
 {
-  "proxy": "http://localhost:4000",
-  "name": "@themesberg/volt-react-dashboard",
-  "description": "Volt React Dashboard is a free and open source admin dashboard template powered by React.js and Bootstrap 5",
-  "author": "Themesberg",
-  "keywords": [
-    "bootstrap 5",
-    "react",
-    "react dashboard",
-    "react admin template",
-    "free react",
-    "react ui library",
-    "react bootstrap 5",
-    "bootstrap 5 dashboard",
-    "themesberg"
-  ],
+  "name": "slaughterhouse-admin-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Arabic RTL slaughterhouse administration dashboard.",
+  "author": "Rawah Hassan",
   "license": "MIT",
-  "homepage": "https://demo.themesberg.com/volt-react-dashboard",
-  "bugs": {
-    "url": "https://github.com/themesberg/volt-react-dashboard/issues"
-  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/themesberg/volt-react-dashboard"
+    "url": "git+https://github.com/rawah-tech/React-Dashboard.git"
   },
-  "version": "1.0.1",
-  "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^1.2.36",
-    "@fortawesome/free-brands-svg-icons": "^5.15.4",
-    "@fortawesome/free-regular-svg-icons": "^5.15.4",
-    "@fortawesome/free-solid-svg-icons": "^5.15.4",
-    "@fortawesome/react-fontawesome": "^0.1.19",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@themesberg/react-bootstrap": "^1.4.1",
-    "axios": "^0.27.2",
-    "bootstrap": "5.0.0-beta1",
-    "chartist": "^0.11.4",
-    "chartist-plugin-tooltips-updated": "^0.1.4",
-    "form-data": "^4.0.0",
-    "mdbreact": "^5.2.0",
-    "moment-timezone": "^0.5.31",
-    "node-sass": "^4.14.1",
-    "react": "^16.13.1",
-    "react-alert": "^7.0.3",
-    "react-alert-template-basic": "^1.0.2",
-    "react-chartist": "^0.14.4",
-    "react-copy-to-clipboard": "^5.0.3",
-    "react-datetime": "^3.0.4",
-    "react-dom": "^16.13.1",
-    "react-geocode": "^0.2.3",
-    "react-github-btn": "^1.2.0",
-    "react-google-autocomplete": "^2.7.0",
-    "react-google-maps": "^9.4.5",
-    "react-live": "^2.2.3",
-    "react-redux": "^8.0.2",
-    "react-router-dom": "^5.2.0",
-    "react-router-hash-link": "^2.3.1",
-    "react-scripts": "3.4.3",
-    "react-transition-group": "^4.4.1",
-    "redux": "^4.2.0",
-    "redux-devtools-extension": "^2.13.9",
-    "redux-thunk": "^2.4.1",
-    "simplebar-react": "^2.3.0"
+  "keywords": [
+    "react",
+    "dashboard",
+    "slaughterhouse",
+    "arabic",
+    "rtl"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0 <25",
+    "npm": ">=10"
   },
+  "packageManager": "npm@11.6.2",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "build-local": "PUBLIC_URL=./ react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
-  "eslintConfig": {
-    "extends": "react-app"
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "1.2.36",
+    "@fortawesome/free-regular-svg-icons": "5.15.4",
+    "@fortawesome/free-solid-svg-icons": "5.15.4",
+    "@fortawesome/react-fontawesome": "0.1.19",
+    "@react-google-maps/api": "2.20.8",
+    "@themesberg/react-bootstrap": "1.4.1",
+    "axios": "1.20.0",
+    "bootstrap": "5.0.0-beta1",
+    "chartist": "0.11.4",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-redux": "8.0.2",
+    "react-router-dom": "5.3.4",
+    "react-transition-group": "4.4.2",
+    "redux": "4.2.0",
+    "redux-thunk": "2.4.1",
+    "simplebar-react": "3.3.2"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.1",
+    "@vitejs/plugin-react": "6.1.2",
+    "jsdom": "29.1.1",
+    "sass": "1.105.2",
+    "vite": "8.3.4",
+    "vitest": "4.1.12"
   }
 }

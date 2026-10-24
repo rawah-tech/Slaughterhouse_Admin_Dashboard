@@ -1,4 +1,5 @@
-import axios from 'axios'
+import apiClient from "../api/client";
+import { getApiErrorMessage } from "../api/errors";
 import {
     LOGIN_REQUEST,
     LOGIN_SUCCESS,
@@ -6,6 +7,9 @@ import {
     REGISTER_USER_REQUEST,
     REGISTER_USER_SUCCESS,
     REGISTER_USER_FAIL,
+    ADMIN_CREATE_USER_REQUEST,
+    ADMIN_CREATE_USER_SUCCESS,
+    ADMIN_CREATE_USER_FAIL,
     LOAD_USER_REQUEST,
     LOAD_USER_SUCCESS,
     LOAD_USER_FAIL,
@@ -33,334 +37,234 @@ import {
     DELETE_USER_REQUEST,
     DELETE_USER_SUCCESS,
     DELETE_USER_FAIL,
+    LOGOUT_REQUEST,
     LOGOUT_SUCCESS,
     LOGOUT_FAIL,
     CLEAR_ERRORS
-} from '../constants/userConstants'
+} from "../constants/userConstants";
 
-// Login
+const dispatchFailure = (dispatch, type, error) => {
+    const message = getApiErrorMessage(error);
+    dispatch({ type, payload: message });
+    return message;
+};
+
 export const login = (phone, password) => async (dispatch) => {
+    dispatch({ type: LOGIN_REQUEST });
+
     try {
-
-        dispatch({ type: LOGIN_REQUEST })
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.post('/api/v1/login', { phone, password }, config)
+        const { data } = await apiClient.post("/api/v1/login", { phone, password });
 
         dispatch({
             type: LOGIN_SUCCESS,
             payload: data.user
-        })
+        });
 
+        return data.user;
     } catch (error) {
-        dispatch({
-            type: LOGIN_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, LOGIN_FAIL, error);
+        return null;
     }
-}
+};
 
-// Register user
+// Retained for the existing public/session registration contract.
 export const register = (userData) => async (dispatch) => {
+    dispatch({ type: REGISTER_USER_REQUEST });
+
     try {
-
-        dispatch({ type: REGISTER_USER_REQUEST })
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.post('/api/v1/register', JSON.stringify(userData), config)
+        const { data } = await apiClient.post("/api/v1/register", userData);
 
         dispatch({
             type: REGISTER_USER_SUCCESS,
             payload: data.user
-        })
+        });
 
+        return data.user;
     } catch (error) {
-        dispatch({
-            type: REGISTER_USER_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, REGISTER_USER_FAIL, error);
+        return null;
     }
-}
+};
 
-
+// Administrator-created users intentionally use state separate from authReducer.
 export const newUser = (userData) => async (dispatch) => {
+    dispatch({ type: ADMIN_CREATE_USER_REQUEST });
+
     try {
-
-        dispatch({ type: REGISTER_USER_REQUEST  })
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-			const { data } = await axios.post(`/api/v1/register`, JSON.stringify(userData), config)
+        const { data } = await apiClient.post("/api/v1/register", userData);
 
         dispatch({
-            type: REGISTER_USER_SUCCESS,
-            payload: data
-        })
+            type: ADMIN_CREATE_USER_SUCCESS,
+            payload: data.user
+        });
 
+        return data.user;
     } catch (error) {
-        dispatch({
-            type: REGISTER_USER_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, ADMIN_CREATE_USER_FAIL, error);
+        return null;
     }
-}
+};
 
-// Load user
 export const loadUser = () => async (dispatch) => {
+    dispatch({ type: LOAD_USER_REQUEST });
+
     try {
-
-        dispatch({ type: LOAD_USER_REQUEST })
-
-        const { data } = await axios.get('/api/v1/me')
+        const { data } = await apiClient.get("/api/v1/me");
 
         dispatch({
             type: LOAD_USER_SUCCESS,
             payload: data.user
-        })
+        });
 
+        return data.user;
     } catch (error) {
-        dispatch({
-            type: LOAD_USER_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, LOAD_USER_FAIL, error);
+        return null;
     }
-}
+};
 
-// Update profile
 export const updateProfile = (userData) => async (dispatch) => {
+    dispatch({ type: UPDATE_PROFILE_REQUEST });
+
     try {
-
-        dispatch({ type: UPDATE_PROFILE_REQUEST })
-
-        const config = {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        }
-
-        const { data } = await axios.put('/api/v1/me/update', userData, config)
+        const { data } = await apiClient.put("/api/v1/me/update", userData);
 
         dispatch({
             type: UPDATE_PROFILE_SUCCESS,
             payload: data.success
-        })
-
+        });
     } catch (error) {
-        dispatch({
-            type: UPDATE_PROFILE_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, UPDATE_PROFILE_FAIL, error);
     }
-}
+};
 
-// Update password
 export const updatePassword = (passwords) => async (dispatch) => {
+    dispatch({ type: UPDATE_PASSWORD_REQUEST });
+
     try {
-
-        dispatch({ type: UPDATE_PASSWORD_REQUEST })
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.put('/api/v1/password/update', passwords, config)
+        const { data } = await apiClient.put("/api/v1/password/update", passwords);
 
         dispatch({
             type: UPDATE_PASSWORD_SUCCESS,
             payload: data.success
-        })
-
+        });
     } catch (error) {
-        dispatch({
-            type: UPDATE_PASSWORD_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, UPDATE_PASSWORD_FAIL, error);
     }
-}
+};
 
-// Forgot password
 export const forgotPassword = (email) => async (dispatch) => {
+    dispatch({ type: FORGOT_PASSWORD_REQUEST });
+
     try {
-
-        dispatch({ type: FORGOT_PASSWORD_REQUEST })
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.post('/api/v1/password/forgot', email, config)
+        const { data } = await apiClient.post("/api/v1/password/forgot", email);
 
         dispatch({
             type: FORGOT_PASSWORD_SUCCESS,
             payload: data.message
-        })
-
+        });
     } catch (error) {
-        dispatch({
-            type: FORGOT_PASSWORD_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, FORGOT_PASSWORD_FAIL, error);
     }
-}
+};
 
-// Reset password
 export const resetPassword = (token, passwords) => async (dispatch) => {
+    dispatch({ type: NEW_PASSWORD_REQUEST });
+
     try {
-
-        dispatch({ type: NEW_PASSWORD_REQUEST })
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.put(`/api/v1/password/reset/${token}`, passwords, config)
+        const { data } = await apiClient.put(
+            `/api/v1/password/reset/${token}`,
+            passwords
+        );
 
         dispatch({
             type: NEW_PASSWORD_SUCCESS,
             payload: data.success
-        })
-
+        });
     } catch (error) {
-        dispatch({
-            type: NEW_PASSWORD_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, NEW_PASSWORD_FAIL, error);
     }
-}
+};
 
-// Logout user
 export const logout = () => async (dispatch) => {
+    dispatch({ type: LOGOUT_REQUEST });
+
     try {
-
-        await axios.get('/api/v1/logout')
-
-        dispatch({
-            type: LOGOUT_SUCCESS,
-        })
-
+        await apiClient.get("/api/v1/logout");
+        dispatch({ type: LOGOUT_SUCCESS });
+        return { success: true, error: null };
     } catch (error) {
-        dispatch({
-            type: LOGOUT_FAIL,
-            payload: error.response.data.message
-        })
+        const message = dispatchFailure(dispatch, LOGOUT_FAIL, error);
+
+        // LOGOUT_FAIL also clears local identity so a backend outage cannot trap
+        // the user in a partially authenticated UI.
+        return { success: false, error: message };
     }
-}
+};
 
-// Get all users
 export const allUsers = () => async (dispatch) => {
+    dispatch({ type: ALL_USERS_REQUEST });
+
     try {
-
-        dispatch({ type: ALL_USERS_REQUEST })
-
-        const { data } = await axios.get('/api/v1/admin/users')
+        const { data } = await apiClient.get("/api/v1/admin/users");
 
         dispatch({
             type: ALL_USERS_SUCCESS,
             payload: data.users
-        })
-
+        });
     } catch (error) {
-        dispatch({
-            type: ALL_USERS_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, ALL_USERS_FAIL, error);
     }
-}
+};
 
-// Update user - ADMIN
 export const updateUser = (id, userData) => async (dispatch) => {
+    dispatch({ type: UPDATE_USER_REQUEST });
+
     try {
-
-        dispatch({ type: UPDATE_USER_REQUEST })
-
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.put(`/api/v1/admin/user/${id}`, JSON.stringify(userData), config)
+        const { data } = await apiClient.put(
+            `/api/v1/admin/user/${id}`,
+            userData
+        );
 
         dispatch({
             type: UPDATE_USER_SUCCESS,
             payload: data.success
-        })
-
+        });
     } catch (error) {
-        dispatch({
-            type: UPDATE_USER_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, UPDATE_USER_FAIL, error);
     }
-}
+};
 
-// Get user details - ADMIN
 export const getUserDetails = (id) => async (dispatch) => {
+    dispatch({ type: USER_DETAILS_REQUEST });
+
     try {
-
-        dispatch({ type: USER_DETAILS_REQUEST })
-
-
-        const { data } = await axios.get(`/api/v1/admin/user/${id}`)
+        const { data } = await apiClient.get(`/api/v1/admin/user/${id}`);
 
         dispatch({
             type: USER_DETAILS_SUCCESS,
             payload: data.user
-        })
-
+        });
     } catch (error) {
-        dispatch({
-            type: USER_DETAILS_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, USER_DETAILS_FAIL, error);
     }
-}
+};
 
-// Delete user - ADMIN
 export const deleteUser = (id) => async (dispatch) => {
+    dispatch({ type: DELETE_USER_REQUEST });
+
     try {
-
-        dispatch({ type: DELETE_USER_REQUEST })
-
-        const { data } = await axios.delete(`/api/v1/admin/user/${id}`)
+        const { data } = await apiClient.delete(`/api/v1/admin/user/${id}`);
 
         dispatch({
             type: DELETE_USER_SUCCESS,
             payload: data.success
-        })
-
+        });
     } catch (error) {
-        dispatch({
-            type: DELETE_USER_FAIL,
-            payload: error.response.data.message
-        })
+        dispatchFailure(dispatch, DELETE_USER_FAIL, error);
     }
-}
+};
 
-
-// Clear Errors
-export const clearErrors = () => async (dispatch) => {
-    dispatch({
-        type: CLEAR_ERRORS
-    })
-}
+export const clearErrors = () => (dispatch) => {
+    dispatch({ type: CLEAR_ERRORS });
+};

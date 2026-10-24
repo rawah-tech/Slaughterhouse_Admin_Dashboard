@@ -1,4 +1,5 @@
-import axios from 'axios'
+import apiClient from '../api/client'
+import { getApiErrorMessage } from '../api/errors'
 
 import {
     CREATE_ORDER_REQUEST,
@@ -22,18 +23,12 @@ import {
     CLEAR_ERRORS
 } from '../constants/orderConstants'
 
-export const createOrder = (order) => async (dispatch, getState) => {
+export const createOrder = (order) => async (dispatch) => {
     try {
 
         dispatch({ type: CREATE_ORDER_REQUEST })
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.post('/api/v1/order/new', order, config)
+        const { data } = await apiClient.post('/api/v1/order/new', order)
 
         dispatch({
             type: CREATE_ORDER_SUCCESS,
@@ -43,7 +38,7 @@ export const createOrder = (order) => async (dispatch, getState) => {
     } catch (error) {
         dispatch({
             type: CREATE_ORDER_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -54,7 +49,7 @@ export const myOrders = () => async (dispatch) => {
 
         dispatch({ type: MY_ORDERS_REQUEST });
 
-        const { data } = await axios.get('/api/v1/orders/me')
+        const { data } = await apiClient.get('/api/v1/orders/me')
 
         dispatch({
             type: MY_ORDERS_SUCCESS,
@@ -64,7 +59,7 @@ export const myOrders = () => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: MY_ORDERS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -75,7 +70,7 @@ export const getOrderDetails = (id) => async (dispatch) => {
 
         dispatch({ type: ORDER_DETAILS_REQUEST });
 
-        const { data } = await axios.get(`/api/v1/order/${id}`)
+        const { data } = await apiClient.get(`/api/v1/order/${id}`)
 
         dispatch({
             type: ORDER_DETAILS_SUCCESS,
@@ -85,7 +80,7 @@ export const getOrderDetails = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: ORDER_DETAILS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -96,7 +91,7 @@ export const allOrders = () => async (dispatch) => {
 
         dispatch({ type: ALL_ORDERS_REQUEST });
 
-        const { data } = await axios.get(`/api/v1/admin/orders`)
+        const { data } = await apiClient.get(`/api/v1/admin/orders`)
 
         dispatch({
             type: ALL_ORDERS_SUCCESS,
@@ -106,7 +101,7 @@ export const allOrders = () => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: ALL_ORDERS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -117,13 +112,7 @@ export const updateOrder = (id, orderData) => async (dispatch) => {
 
         dispatch({ type: UPDATE_ORDER_REQUEST })
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.put(`/api/v1/admin/order/${id}`, JSON.stringify(orderData), config)
+        const { data } = await apiClient.put(`/api/v1/admin/order/${id}`, orderData)
 
         dispatch({
             type: UPDATE_ORDER_SUCCESS,
@@ -133,7 +122,7 @@ export const updateOrder = (id, orderData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: UPDATE_ORDER_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -144,7 +133,7 @@ export const deleteOrder = (id) => async (dispatch) => {
 
         dispatch({ type: DELETE_ORDER_REQUEST })
 
-        const { data } = await axios.delete(`/api/v1/admin/order/${id}`)
+        const { data } = await apiClient.delete(`/api/v1/admin/order/${id}`)
 
         dispatch({
             type: DELETE_ORDER_SUCCESS,
@@ -154,7 +143,7 @@ export const deleteOrder = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: DELETE_ORDER_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
