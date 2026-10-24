@@ -6,6 +6,10 @@ import {
     REGISTER_USER_SUCCESS,
     REGISTER_USER_RESET,
     REGISTER_USER_FAIL,
+    ADMIN_CREATE_USER_REQUEST,
+    ADMIN_CREATE_USER_SUCCESS,
+    ADMIN_CREATE_USER_RESET,
+    ADMIN_CREATE_USER_FAIL,
     LOAD_USER_REQUEST,
     LOAD_USER_SUCCESS,
     LOAD_USER_FAIL,
@@ -37,20 +41,38 @@ import {
     DELETE_USER_SUCCESS,
     DELETE_USER_RESET,
     DELETE_USER_FAIL,
+    LOGOUT_REQUEST,
     LOGOUT_SUCCESS,
     LOGOUT_FAIL,
     CLEAR_ERRORS
 } from '../constants/userConstants'
 
-export const authReducer = (state = { user: {} }, action) => {
+const initialAuthState = {
+    user: null,
+    isAuthenticated: false,
+    loading: true,
+    error: null
+}
+
+export const authReducer = (state = initialAuthState, action) => {
     switch (action.type) {
 
         case LOGIN_REQUEST:
         case REGISTER_USER_REQUEST:
-        case LOAD_USER_REQUEST:
             return {
-                loading: true,
+                ...state,
+                user: null,
                 isAuthenticated: false,
+                loading: true,
+                error: null
+            }
+
+        case LOAD_USER_REQUEST:
+        case LOGOUT_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                error: null
             }
 
         case LOGIN_SUCCESS:
@@ -60,9 +82,11 @@ export const authReducer = (state = { user: {} }, action) => {
                 ...state,
                 loading: false,
                 isAuthenticated: true,
-                user: action.payload
+                user: action.payload,
+                error: null
             }
-            case REGISTER_USER_RESET:
+
+        case REGISTER_USER_RESET:
             return {
                 ...state,
                 success: false
@@ -72,23 +96,11 @@ export const authReducer = (state = { user: {} }, action) => {
             return {
                 loading: false,
                 isAuthenticated: false,
-                user: null
+                user: null,
+                error: null
             }
 
         case LOAD_USER_FAIL:
-            return {
-                loading: false,
-                isAuthenticated: false,
-                user: null,
-                error: action.payload
-            }
-
-        case LOGOUT_FAIL:
-            return {
-                ...state,
-                error: action.payload
-            }
-
         case LOGIN_FAIL:
         case REGISTER_USER_FAIL:
             return {
@@ -98,6 +110,62 @@ export const authReducer = (state = { user: {} }, action) => {
                 user: null,
                 error: action.payload
             }
+
+        case LOGOUT_FAIL:
+            return {
+                ...state,
+                loading: false,
+                isAuthenticated: false,
+                user: null,
+                error: action.payload
+            }
+
+        case CLEAR_ERRORS:
+            return {
+                ...state,
+                error: null
+            }
+
+        default:
+            return state
+    }
+}
+
+const initialAdminUserCreationState = {
+    loading: false,
+    success: false,
+    createdUser: null,
+    error: null
+}
+
+export const adminUserCreationReducer = (state = initialAdminUserCreationState, action) => {
+    switch (action.type) {
+        case ADMIN_CREATE_USER_REQUEST:
+            return {
+                ...state,
+                loading: true,
+                success: false,
+                error: null
+            }
+
+        case ADMIN_CREATE_USER_SUCCESS:
+            return {
+                loading: false,
+                success: true,
+                createdUser: action.payload,
+                error: null
+            }
+
+        case ADMIN_CREATE_USER_FAIL:
+            return {
+                ...state,
+                loading: false,
+                success: false,
+                error: action.payload
+            }
+
+        case ADMIN_CREATE_USER_RESET:
+            return initialAdminUserCreationState
 
         case CLEAR_ERRORS:
             return {

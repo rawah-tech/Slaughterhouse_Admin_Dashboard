@@ -1,9 +1,8 @@
-import { createStore, combineReducers, applyMiddleware } from 'redux';
+import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
-import { composeWithDevTools } from 'redux-devtools-extension'
 
 import { productsReducer, newProductReducer, productReducer, productDetailsReducer, newReviewReducer, productReviewsReducer, reviewReducer } from './reducers/productReducers'
-import { authReducer, userReducer, forgotPasswordReducer, allUsersReducer, userDetailsReducer } from './reducers/userReducers'
+import { authReducer, adminUserCreationReducer, userReducer, forgotPasswordReducer, allUsersReducer, userDetailsReducer } from './reducers/userReducers'
 
 import { newOrderReducer, myOrdersReducer, orderDetailsReducer, allOrdersReducer, orderReducer } from './reducers/orderReducers'
 
@@ -22,6 +21,7 @@ const reducer = combineReducers({
     review: reviewReducer,
 
     auth: authReducer,
+    newUser: adminUserCreationReducer,
     user: userReducer,
     allUsers: allUsersReducer,
     userDetails: userDetailsReducer,
@@ -52,18 +52,15 @@ const reducer = combineReducers({
 })
 
 
-let initialState = {
-    cart: {
-        cartItems: localStorage.getItem('cartItems')
-            ? JSON.parse(localStorage.getItem('cartItems'))
-            : [],
-        shippingInfo: localStorage.getItem('shippingInfo')
-            ? JSON.parse(localStorage.getItem('shippingInfo'))
-            : {}
-    }
-}
-
 const middlware = [thunk];
-const store = createStore(reducer, initialState, composeWithDevTools(applyMiddleware(...middlware)))
+const composeEnhancers =
+    import.meta.env.DEV && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+        ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
+        : compose;
+
+const store = createStore(
+    reducer,
+    composeEnhancers(applyMiddleware(...middlware))
+)
 
 export default store;

@@ -30,8 +30,9 @@ export const deliverysReducer = (state = { deliverys: [] }, action) => {
         case ALL_DELIVERYS_REQUEST:
         case ADMIN_DELIVERYS_REQUEST:
             return {
+                ...state,
                 loading: true,
-                deliverys: []
+                error: null
             }
 
         case ALL_DELIVERYS_SUCCESS:
@@ -52,6 +53,7 @@ export const deliverysReducer = (state = { deliverys: [] }, action) => {
         case ALL_DELIVERYS_FAIL:
         case ADMIN_DELIVERYS_FAIL:
             return {
+                ...state,
                 loading: false,
                 error: action.payload
             }
@@ -73,7 +75,8 @@ export const newDeliveryReducer = (state = { delivery: {} }, action) => {
         case NEW_DELIVERY_REQUEST:
             return {
                 ...state,
-                loading: true
+                loading: true,
+                error: null
             }
 
         case NEW_DELIVERY_SUCCESS:
@@ -86,6 +89,7 @@ export const newDeliveryReducer = (state = { delivery: {} }, action) => {
         case NEW_DELIVERY_FAIL:
             return {
                 ...state,
+                loading: false,
                 error: action.payload
             }
 
@@ -113,7 +117,8 @@ export const deliveryReducer = (state = {}, action) => {
         case UPDATE_DELIVERY_REQUEST:
             return {
                 ...state,
-                loading: true
+                loading: true,
+                error: null
             }
 
         case DELETE_DELIVERY_SUCCESS:
@@ -135,6 +140,7 @@ export const deliveryReducer = (state = {}, action) => {
         case UPDATE_DELIVERY_FAIL:
             return {
                 ...state,
+                loading: false,
                 error: action.payload
             }
 
@@ -167,7 +173,8 @@ export const deliveryDetailsReducer = (state = { delivery: {} }, action) => {
         case DELIVERY_DETAILS_REQUEST:
             return {
                 ...state,
-                loading: true
+                loading: true,
+                error: null
             }
 
         case DELIVERY_DETAILS_SUCCESS:
@@ -179,6 +186,7 @@ export const deliveryDetailsReducer = (state = { delivery: {} }, action) => {
         case DELIVERY_DETAILS_FAIL:
             return {
                 ...state,
+                loading: false,
                 error: action.payload
             }
 

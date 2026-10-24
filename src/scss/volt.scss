@@ -43,3 +43,14 @@
 @import "volt/components";
 
 // write your custom styles here!
+.app-alert {
+  position: fixed;
+  inset-inline-start: 50%;
+  bottom: 1.5rem;
+  z-index: 1100;
+  display: flex;
+  align-items: center;
+  max-width: min(90vw, 36rem);
+  transform: translateX(-50%);
+  box-shadow: 0 0.5rem 1.5rem rgba(20, 20, 40, 0.18);
+}

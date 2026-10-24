@@ -1,4 +1,5 @@
-import axios from 'axios';
+import apiClient from '../api/client'
+import { getApiErrorMessage } from '../api/errors'
 
 import {
     ALL_DELIVERYS_REQUEST,
@@ -24,18 +25,21 @@ import {
 
 } from '../constants/deliveryConstants'
 
-export const getDeliverys = (keyword = '', currentPage = 1, price, category, rating = 0) => async (dispatch) => {
+export const getDeliverys = (keyword = '', currentPage = 1, price = [], category, rating = 0) => async (dispatch) => {
     try {
 
         dispatch({ type: ALL_DELIVERYS_REQUEST })
 
-        let link = `/api/v1/DELIVERYs?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&ratings[gte]=${rating}`
+        const priceQuery = price.length >= 2
+            ? `&price[lte]=${encodeURIComponent(price[1])}&price[gte]=${encodeURIComponent(price[0])}`
+            : ''
+        let link = `/api/v1/DELIVERYs?keyword=${encodeURIComponent(keyword)}&page=${currentPage}${priceQuery}&ratings[gte]=${rating}`
 
         if (category) {
-            link = `/api/v1/DELIVERYs?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&category=${category}&ratings[gte]=${rating}`
+            link += `&category=${encodeURIComponent(category)}`
         }
 
-        const { data } = await axios.get(link)
+        const { data } = await apiClient.get(link)
 
         dispatch({
             type: ALL_DELIVERYS_SUCCESS,
@@ -45,7 +49,7 @@ export const getDeliverys = (keyword = '', currentPage = 1, price, category, rat
     } catch (error) {
         dispatch({
             type: ALL_DELIVERYS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -55,13 +59,7 @@ export const newDelivery = (deliveryData) => async (dispatch) => {
 
         dispatch({ type: NEW_DELIVERY_REQUEST })
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-			const { data } = await axios.post(`/api/v1/admin/delivery/new`, JSON.stringify(deliveryData), config)
+        const { data } = await apiClient.post(`/api/v1/admin/delivery/new`, deliveryData)
 
         dispatch({
             type: NEW_DELIVERY_SUCCESS,
@@ -71,7 +69,7 @@ export const newDelivery = (deliveryData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: NEW_DELIVERY_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -82,7 +80,7 @@ export const deleteDelivery = (id) => async (dispatch) => {
 
         dispatch({ type: DELETE_DELIVERY_REQUEST })
 
-        const { data } = await axios.delete(`/api/v1/admin/delivery/${id}`)
+        const { data } = await apiClient.delete(`/api/v1/admin/delivery/${id}`)
 
         dispatch({
             type: DELETE_DELIVERY_SUCCESS,
@@ -92,7 +90,7 @@ export const deleteDelivery = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: DELETE_DELIVERY_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -103,13 +101,7 @@ export const updateDelivery = (id, deliveryData) => async (dispatch) => {
 
         dispatch({ type: UPDATE_DELIVERY_REQUEST })
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.put(`/api/v1/admin/delivery/${id}`, JSON.stringify(deliveryData), config)
+        const { data } = await apiClient.put(`/api/v1/admin/delivery/${id}`, deliveryData)
 
         dispatch({
             type: UPDATE_DELIVERY_SUCCESS,
@@ -119,7 +111,7 @@ export const updateDelivery = (id, deliveryData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: UPDATE_DELIVERY_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -129,7 +121,7 @@ export const getDeliveryDetails = (id) => async (dispatch) => {
 
         dispatch({ type: DELIVERY_DETAILS_REQUEST })
 
-        const { data } = await axios.get(`/api/v1/delivery/${id}`)
+        const { data } = await apiClient.get(`/api/v1/delivery/${id}`)
 
         dispatch({
             type: DELIVERY_DETAILS_SUCCESS,
@@ -139,7 +131,7 @@ export const getDeliveryDetails = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: DELIVERY_DETAILS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -152,7 +144,7 @@ export const getAdminDeliverys = () => async (dispatch) => {
 
         dispatch({ type: ADMIN_DELIVERYS_REQUEST })
 
-        const { data } = await axios.get(`/api/v1/admin/deliverys`)
+        const { data } = await apiClient.get(`/api/v1/admin/deliverys`)
 
         dispatch({
             type: ADMIN_DELIVERYS_SUCCESS,
@@ -163,7 +155,7 @@ export const getAdminDeliverys = () => async (dispatch) => {
 
         dispatch({
             type: ADMIN_DELIVERYS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }

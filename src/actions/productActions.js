@@ -1,4 +1,5 @@
-import axios from 'axios';
+import apiClient from '../api/client'
+import { getApiErrorMessage } from '../api/errors'
 
 import {
     ALL_PRODUCTS_REQUEST,
@@ -33,18 +34,21 @@ import {
 
 } from '../constants/productConstants'
 
-export const getProducts = (keyword = '', currentPage = 1, price, category, rating = 0) => async (dispatch) => {
+export const getProducts = (keyword = '', currentPage = 1, price = [], category, rating = 0) => async (dispatch) => {
     try {
 
         dispatch({ type: ALL_PRODUCTS_REQUEST })
 
-        let link = `/api/v1/products?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&ratings[gte]=${rating}`
+        const priceQuery = price.length >= 2
+            ? `&price[lte]=${encodeURIComponent(price[1])}&price[gte]=${encodeURIComponent(price[0])}`
+            : ''
+        let link = `/api/v1/products?keyword=${encodeURIComponent(keyword)}&page=${currentPage}${priceQuery}&ratings[gte]=${rating}`
 
         if (category) {
-            link = `/api/v1/products?keyword=${keyword}&page=${currentPage}&price[lte]=${price[1]}&price[gte]=${price[0]}&category=${category}&ratings[gte]=${rating}`
+            link += `&category=${encodeURIComponent(category)}`
         }
 
-        const { data } = await axios.get(link)
+        const { data } = await apiClient.get(link)
 
         dispatch({
             type: ALL_PRODUCTS_SUCCESS,
@@ -54,7 +58,7 @@ export const getProducts = (keyword = '', currentPage = 1, price, category, rati
     } catch (error) {
         dispatch({
             type: ALL_PRODUCTS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -64,13 +68,7 @@ export const newProduct = (productData) => async (dispatch) => {
 
         dispatch({ type: NEW_PRODUCT_REQUEST })
 
-        const config = {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        }
-
-			const { data } = await axios.post(`/api/v1/admin/product/new`, productData, config)
+        const { data } = await apiClient.post(`/api/v1/admin/product/new`, productData)
 
         dispatch({
             type: NEW_PRODUCT_SUCCESS,
@@ -80,7 +78,7 @@ export const newProduct = (productData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: NEW_PRODUCT_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -91,7 +89,7 @@ export const deleteProduct = (id) => async (dispatch) => {
 
         dispatch({ type: DELETE_PRODUCT_REQUEST })
 
-        const { data } = await axios.delete(`/api/v1/admin/product/${id}`)
+        const { data } = await apiClient.delete(`/api/v1/admin/product/${id}`)
 
         dispatch({
             type: DELETE_PRODUCT_SUCCESS,
@@ -101,7 +99,7 @@ export const deleteProduct = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: DELETE_PRODUCT_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -112,13 +110,7 @@ export const updateProduct = (id, productData) => async (dispatch) => {
 
         dispatch({ type: UPDATE_PRODUCT_REQUEST })
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.put(`/api/v1/admin/product/${id}`, JSON.stringify(productData), config)
+        const { data } = await apiClient.put(`/api/v1/admin/product/${id}`, productData)
 
         dispatch({
             type: UPDATE_PRODUCT_SUCCESS,
@@ -128,7 +120,7 @@ export const updateProduct = (id, productData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: UPDATE_PRODUCT_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -138,7 +130,7 @@ export const getProductDetails = (id) => async (dispatch) => {
 
         dispatch({ type: PRODUCT_DETAILS_REQUEST })
 
-        const { data } = await axios.get(`/api/v1/product/${id}`)
+        const { data } = await apiClient.get(`/api/v1/product/${id}`)
 
         dispatch({
             type: PRODUCT_DETAILS_SUCCESS,
@@ -148,7 +140,7 @@ export const getProductDetails = (id) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: PRODUCT_DETAILS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -158,13 +150,7 @@ export const newReview = (reviewData) => async (dispatch) => {
 
         dispatch({ type: NEW_REVIEW_REQUEST })
 
-        const config = {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-
-        const { data } = await axios.put(`/api/v1/review`, reviewData, config)
+        const { data } = await apiClient.put(`/api/v1/review`, reviewData)
 
         dispatch({
             type: NEW_REVIEW_SUCCESS,
@@ -174,7 +160,7 @@ export const newReview = (reviewData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: NEW_REVIEW_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -185,7 +171,7 @@ export const getAdminProducts = () => async (dispatch) => {
 
         dispatch({ type: ADMIN_PRODUCTS_REQUEST })
 
-        const { data } = await axios.get(`/api/v1/admin/products`)
+        const { data } = await apiClient.get(`/api/v1/admin/products`)
 
         dispatch({
             type: ADMIN_PRODUCTS_SUCCESS,
@@ -196,7 +182,7 @@ export const getAdminProducts = () => async (dispatch) => {
 
         dispatch({
             type: ADMIN_PRODUCTS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -207,7 +193,7 @@ export const getProductReviews = (id) => async (dispatch) => {
 
         dispatch({ type: GET_REVIEWS_REQUEST })
 
-        const { data } = await axios.get(`/api/v1/reviews?id=${id}`)
+        const { data } = await apiClient.get(`/api/v1/reviews?id=${encodeURIComponent(id)}`)
 
         dispatch({
             type: GET_REVIEWS_SUCCESS,
@@ -218,7 +204,7 @@ export const getProductReviews = (id) => async (dispatch) => {
 
         dispatch({
             type: GET_REVIEWS_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
@@ -229,7 +215,7 @@ export const deleteReview = (id, productId) => async (dispatch) => {
 
         dispatch({ type: DELETE_REVIEW_REQUEST })
 
-        const { data } = await axios.delete(`/api/v1/reviews?id=${id}&productId=${productId}`)
+        const { data } = await apiClient.delete(`/api/v1/reviews?id=${encodeURIComponent(id)}&productId=${encodeURIComponent(productId)}`)
 
         dispatch({
             type: DELETE_REVIEW_SUCCESS,
@@ -238,11 +224,9 @@ export const deleteReview = (id, productId) => async (dispatch) => {
 
     } catch (error) {
 
-        console.log(error.response);
-
         dispatch({
             type: DELETE_REVIEW_FAIL,
-            payload: error.response.data.message
+            payload: getApiErrorMessage(error)
         })
     }
 }
